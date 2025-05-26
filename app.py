@@ -10,11 +10,13 @@ TOKEN = os.getenv('TELEGRAM_TOKEN')
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print('Conversation started')
     await update.message.reply_text("Hi! Say something, and I'll repeat it.")
 
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
+    print('Echo of the received message:', user_message)
     await update.message.reply_text(f"You said: {user_message}")
 
 
