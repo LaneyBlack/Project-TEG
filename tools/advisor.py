@@ -43,7 +43,7 @@ def analyze_job_offer_against_cv(job_offer: str) -> str:
     - Skills where the user is overqualified.
     - Skills or requirements the user lacks or should improve.
 
-    Return your advice in structured bullet points.
+    Return your advice in structured bullet points. 
     """
 
     result = retrieval_chain.invoke({"input": advisor_query})
