@@ -1,72 +1,50 @@
-# pip install openai langchain-core langchain-openai numpy scikit-learn python-dotenv
-
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
+from langchain.chains.retrieval import create_retrieval_chain
+from langchain import hub
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_pinecone import PineconeVectorStore
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langchain_text_splitters import CharacterTextSplitter
 
-# 1. Załaduj zmienne środowiskowe z pliku .env
 load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY_TEG") or os.getenv("OPENAI_API_KEY")
-if not api_key:
-    raise RuntimeError("Brakuje zmiennej środowiskowej OPENAI_API_KEY_TEG lub OPENAI_API_KEY w .env")
-# Ustaw też standardową zmienną dla SDK
-os.environ["OPENAI_API_KEY"] = api_key
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")  # tak jak w pierwszym kodzie
 
-# 2. Import klas LangChain i OpenAI
-from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-from langchain.chains import RetrievalQA
-from langchain.prompts import PromptTemplate
-from langchain_core.vectorstores import InMemoryVectorStore
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+INDEX_NAME = os.environ["INDEX_NAME"]
+vectorstore = PineconeVectorStore(index_name=INDEX_NAME, embedding=embeddings)
+chat = ChatOpenAI(verbose=True, temperature=0.7)  # model_name="gpt-4" jeśli masz dostęp
 
-# 3. Przygotowanie embeddingów
-embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
-
-# 4. Twoje dane
+user_id = "user_1"
 doswiadczenie = [
     "Projektowanie REST API w Django",
     "Integracja z serwisami zewnętrznymi (SOAP, REST)",
     "Code review i mentoring młodszych devów"
 ]
 umiejetnosci = ["Python", "Django", "JavaScript", "SQL", "Docker", "Git"]
+
+# Ingest: dzielimy i wrzucamy do bazy
+def ingest_profile(profile_fragments: list[str]):
+    splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    # każdy wpis traktujemy osobno albo łączymy
+    chunks = []
+    for txt in profile_fragments:
+        chunks += splitter.split_text(txt)
+    vectorstore.add_texts(chunks, metadatas=[{"user_id":user_id}]*len(chunks))
+
+# Przygotuj profile
+ingest_profile(doswiadczenie + umiejetnosci)
+
+# Build retrieval chain
+retriever = vectorstore.as_retriever(search_kwargs={"filter":{"user_id":user_id}, "k":5})
+retrieval_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
+stuff_chain = create_stuff_documents_chain(chat, retrieval_prompt)
+qa_chain = create_retrieval_chain(retriever=retriever, combine_docs_chain=stuff_chain)
+
+# Generowanie CV na podstawie opisu
 job_description = (
     "Senior Backend Developer (Python/Django). Poszukujemy osoby, która prowadzi projekty backendowe, "
     "optymalizuje zapytania do bazy danych i dba o wysoką jakość kodu."
 )
-
-# 5. InMemoryVectorStore (przechowuje embeddingi w pamięci)
-vector_store = InMemoryVectorStore(embeddings)
-vector_store.add_texts(doswiadczenie + umiejetnosci)
-
-# 6. Retriev­er top-k
-retriever = vector_store.as_retriever(search_kwargs={"k": 5})
-
-# 7. Szablon promptu
-template = """
-Na podstawie poniższych informacji z profilu wygeneruj profesjonalne CV dla stanowiska: {job}
-
-Profil:
-{context}
-"""
-prompt = PromptTemplate(
-    input_variables=["context", "job"],
-    template=template
-)
-
-# 8. Konfiguracja LLM (ChatOpenAI jak GPT-4)
-llm = ChatOpenAI(model_name="gpt-4", temperature=0.7)
-
-# 9. Chain RetrievalQA (łączenie retrieval + generacja CV)
-qa_chain = RetrievalQA.from_chain_type(
-    llm=llm,
-    chain_type="stuff",
-    retriever=retriever,
-    return_source_documents=False,
-    chain_type_kwargs={"prompt": prompt},
-)
-
-# 10. Wykonanie łańcucha
-context_docs = retriever.get_relevant_documents(job_description)
-context_text = "\n".join([doc.page_content for doc in context_docs])
-cv = qa_chain.run({"query": job_description, "context": context_text})
-
-# 11. Wyświetlenie wygenerowanego CV
-print(cv)
+answer = qa_chain.invoke({"input": job_description})
+print(answer)
