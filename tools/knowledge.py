@@ -7,6 +7,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_pinecone import PineconeVectorStore
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_text_splitters import CharacterTextSplitter
+from langsmith import traceable
 
 load_dotenv()
 
@@ -20,7 +21,7 @@ vectorstore = PineconeVectorStore(
 
 user_id = "user_1"
 
-
+@traceable(name="Ingest CV to Knowledge Base")
 def ingest_to_knowledge_base(query: str) -> str:
     text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     texts = text_splitter.split_text(query)
@@ -28,9 +29,9 @@ def ingest_to_knowledge_base(query: str) -> str:
         texts,
         metadatas=[{"user_id": user_id}] * len(texts)
     )
-    return "data inserted"
+    return "CV data inserted successfully."
 
-
+@traceable(name="Retrieve from Knowledge Base")
 def retrieve_from_knowledge_base(query: str) -> str:
     docsearch = PineconeVectorStore(index_name=INDEX_NAME, embedding=embeddings)
     chat = ChatOpenAI(verbose=True, temperature=0)
