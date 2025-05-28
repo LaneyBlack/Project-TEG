@@ -19,10 +19,9 @@ vectorstore = PineconeVectorStore(
     embedding=embeddings
 )
 
-user_id = "user_1"
 
 @traceable(name="Ingest CV to Knowledge Base")
-def ingest_to_knowledge_base(query: str) -> str:
+def ingest_to_knowledge_base(query: str, user_id: str) -> str:
     text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     texts = text_splitter.split_text(query)
     vectorstore.add_texts(
@@ -31,8 +30,9 @@ def ingest_to_knowledge_base(query: str) -> str:
     )
     return "CV data inserted successfully."
 
+
 @traceable(name="Retrieve from Knowledge Base")
-def retrieve_from_knowledge_base(query: str) -> str:
+def retrieve_from_knowledge_base(query: str, user_id: str) -> str:
     docsearch = PineconeVectorStore(index_name=INDEX_NAME, embedding=embeddings)
     chat = ChatOpenAI(verbose=True, temperature=0)
 

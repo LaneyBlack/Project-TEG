@@ -26,7 +26,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if state == "expecting_cv":
         # Store the CV
         await update.message.reply_text("📄 CV received. Embedding and storing...")
-        ingest_to_knowledge_base(text)
+        ingest_to_knowledge_base(text, user_id)
         user_states[user_id]["state"] = "expecting_offer"
         await update.message.reply_text("✅ CV stored. Now send me the job offer you'd like to evaluate.")
     elif state == "expecting_offer":
