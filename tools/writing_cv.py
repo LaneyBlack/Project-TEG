@@ -29,6 +29,13 @@ def generate_cv(
     vectorstore = PineconeVectorStore(index_name=index_name, embedding=embeddings)
     chat = ChatOpenAI(temperature=llm_temp, verbose=True)
 
+    # 3. Ingest profile fragments
+    # splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    # chunks: list[str] = []
+    # for fragment in profile_fragments:
+    #     chunks += splitter.split_text(fragment)
+    # vectorstore.add_texts(chunks, metadatas=[{"user_id": user_id}] * len(chunks))
+
     # 4. Build retrieval → generation chain
     retriever = vectorstore.as_retriever(search_kwargs={"filter": {"user_id": user_id}, "k": 5})
 
@@ -57,5 +64,9 @@ def generate_cv(
 
 # PRZYKŁAD UŻYCIA:
 if __name__ == "__main__":
-    cv_text = generate_cv()
+    job_desc = (
+        "Senior Backend Developer (Python/Django). Poszukujemy osoby, która prowadzi "
+        "projekty backendowe, optymalizuje zapytania do bazy danych i dba o wysoką jakość kodu."
+    )
+    cv_text = generate_cv(job_desc)
     print(cv_text)
