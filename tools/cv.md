@@ -1,18 +1,14 @@
-CV
+# Imię Nazwisko
+**Telefon:** +48 512 314 571
 
-Imię i Nazwisko: [imię i nazwisko]
-Numer telefonu: +48 512 314 571
-E-mail: areut74@gmail.com
-Lokalizacja: Warszawa, Polska
+**E-mail:** areut74@gmail.com
 
-## O MNIE
-Jestem studentem Polsko-Japońskiej Akademii Technik Komputerowych na wydziale Informatyka. Jestem pracownikiem zorganizowanym i skrupulatnym, dobrze pracuję w zespole. Jestem zawsze chętny do wiedzy i uczenia się oraz dostosowuję się do różnego rodzaju obowiązków firmowych w różnych technologiach.
+**Lokalizacja:** Warszawa, Polska
 
-## UMIEJĘTNOŚCI
-- Python
-- Django
-- Optymalizacja zapytań do bazy danych
-- Wysoka jakość kodu
+## O mnie
+Jestem studentem Polsko-Japońskiej Akademii Technik Komputerowych na wydziale Informatyka. Jestem pracownikiem zorganizowanym i skrupulatnym. Dobrze pracuję w zespole. Jestem zawsze chętny do wiedzy i uczenia się. Chętnie się dostosuję do różnego rodzaju obowiązków firmowych w różnych technologiach.
+
+## Umiejętności
 - Unity
 - C#
 - ASP .NET and Entity Framework
@@ -23,22 +19,20 @@ Jestem studentem Polsko-Japońskiej Akademii Technik Komputerowych na wydziale I
 - Java
 - Spring Framework and JavaFX
 - RDB: MS SQL, T-SQL, PL/SQL
+- Python
 - Git
 
-## JĘZYKI
-- Rosyjski (początkujący)
-- Angielski (zaawansowany)
-- Polski (native)
-- Białoruski (początkujący)
-- Niemiecki (początkujący)
+## Języki
+- Rosyjski
+- Angielski
+- Polski
+- Białoruski
+- Niemiecki
 
-## WYKSZTAŁCENIE
-Polsko-Japońska Akademia Technik Komputerowych - Informatyka
-
-## KURSY
+## Wykształcenie
 Java BackEnd Developer, Październik 2019 - Maj 2020
 
-## ZAINTERESOWANIA
+## Zainteresowania
 - Gitara i muzyka
 - Gry komputerowe
 - Nauczanie maszynowe

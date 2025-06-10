@@ -1,11 +1,9 @@
 import os
 from dotenv import load_dotenv
 from langchain.chains.retrieval import create_retrieval_chain
-from langchain import hub
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_pinecone import PineconeVectorStore
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_text_splitters import CharacterTextSplitter
 from langchain.prompts import PromptTemplate
 
 
@@ -33,14 +31,32 @@ def generate_cv(
     my_template = PromptTemplate(
         input_variables=["context", "input"],
         template="""
-    Na podstawie poniższych informacji z profilu wygeneruj profesjonalne CV dla stanowiska: {input}
+Na podstawie poniższych informacji z profilu wygeneruj profesjonalne CV dla stanowiska: {input}
 
-    Profil:
-    {context}
+Profil:
+{context}
 
-    Twoje CV powinno być zwięzłe i konkretne.
-    Nie pisz na początku słowa CV.
-    """
+CV ma być krótkie i na temat. Nie używaj słowa “CV” ani tytułu “Curriculum Vitae”.  
+Zwróć wynik w formacie Markdown zgodnie z poniższą strukturą:
+
+# Imię Nazwisko
+**Telefon:** <numer>
+
+**E-mail:** <adres>
+
+**Lokalizacja:** <miasto, kraj>
+
+## O mnie  
+…  
+
+## Umiejętności  
+- …  
+
+## Języki  
+- …  
+
+i tak dalej  
+"""
     )
 
     # 2. Użyj go zamiast domyślnego
@@ -52,15 +68,16 @@ def generate_cv(
     result = qa_chain.invoke({"input": job_description})
     return result["answer"]
 
-import os
+
 import markdown
 import pdfkit
 
+
 def create_pdf_from_text(
-    text: str,
-    md_path: str = "cv.md",
-    pdf_path: str = "cv.pdf",
-    wkhtmltopdf_path: str = None
+        text: str,
+        md_path: str = "cv.md",
+        pdf_path: str = "cv.pdf",
+        wkhtmltopdf_path: str = None
 ) -> str:
     """
     1. Konwertuje zwarty tekst CV do Markdown (plik .md)
@@ -132,7 +149,6 @@ def create_pdf_from_text(
     options = {"encoding": "UTF-8"}
     pdfkit.from_string(html, pdf_path, configuration=config, options=options)
 
-
     return os.path.abspath(pdf_path)
 
 
@@ -145,5 +161,6 @@ if __name__ == "__main__":
     user_id = "user_1"
     cv_text = generate_cv(user_id=user_id, job_description=job_desc)
     print(cv_text)
-    pdf_file = create_pdf_from_text(cv_text, wkhtmltopdf_path=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
+    base_dir = os.path.dirname(os.path.dirname(__file__))
+    pdf_file = create_pdf_from_text(cv_text, wkhtmltopdf_path=os.path.join(base_dir, "wkhtmltopdf", "bin", "wkhtmltopdf.exe"))
     print(f"Wygenerowano PDF: {pdf_file}")
