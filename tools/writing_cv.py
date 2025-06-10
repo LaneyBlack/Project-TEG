@@ -11,10 +11,7 @@ from langchain.prompts import PromptTemplate
 
 def generate_cv(
         job_description: str,
-        user_id: str = "user_1",
-        index_name_env: str = "INDEX_NAME",
-        embedding_model: str = "text-embedding-3-small",
-        llm_temp: float = 0.7,
+        user_id: str = "user_1"
 ):
     # 1. Load env & API key
     load_dotenv()
@@ -24,17 +21,10 @@ def generate_cv(
     os.environ["OPENAI_API_KEY"] = api_key
 
     # 2. Init embeddings, vectorstore, chat
-    embeddings = OpenAIEmbeddings(model=embedding_model)
-    index_name = os.environ[index_name_env]
+    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+    index_name = os.environ["INDEX_NAME"]
     vectorstore = PineconeVectorStore(index_name=index_name, embedding=embeddings)
-    chat = ChatOpenAI(temperature=llm_temp, verbose=True)
-
-    # 3. Ingest profile fragments
-    # splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-    # chunks: list[str] = []
-    # for fragment in profile_fragments:
-    #     chunks += splitter.split_text(fragment)
-    # vectorstore.add_texts(chunks, metadatas=[{"user_id": user_id}] * len(chunks))
+    chat = ChatOpenAI(temperature=0.7, verbose=True)
 
     # 4. Build retrieval → generation chain
     retriever = vectorstore.as_retriever(search_kwargs={"filter": {"user_id": user_id}, "k": 5})
@@ -68,5 +58,6 @@ if __name__ == "__main__":
         "Senior Backend Developer (Python/Django). Poszukujemy osoby, która prowadzi "
         "projekty backendowe, optymalizuje zapytania do bazy danych i dba o wysoką jakość kodu."
     )
-    cv_text = generate_cv(job_desc)
+    user_id = "user_1";
+    cv_text = generate_cv(user_id=user_id, job_description=job_desc)
     print(cv_text)
