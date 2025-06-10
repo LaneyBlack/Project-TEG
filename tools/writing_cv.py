@@ -39,6 +39,7 @@ def generate_cv(
     {context}
 
     Twoje CV powinno być zwięzłe i konkretne.
+    Nie pisz na początku słowa CV.
     """
     )
 
@@ -51,6 +52,89 @@ def generate_cv(
     result = qa_chain.invoke({"input": job_description})
     return result["answer"]
 
+import os
+import markdown
+import pdfkit
+
+def create_pdf_from_text(
+    text: str,
+    md_path: str = "cv.md",
+    pdf_path: str = "cv.pdf",
+    wkhtmltopdf_path: str = None
+) -> str:
+    """
+    1. Konwertuje zwarty tekst CV do Markdown (plik .md)
+    2. Renderuje Markdown do HTML
+    3. Generuje PDF z HTML za pomocą pdfkit/wkhtmltopdf
+    Zwraca ścieżkę do wygenerowanego PDF.
+    """
+    # 1) Konwersja na Markdown
+    md_lines = []
+    lines = text.splitlines()
+    header_phase = True
+
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            md_lines.append("")
+            continue
+
+        if header_phase:
+            if ":" in stripped and not stripped.startswith("-"):
+                key, val = stripped.split(":", 1)
+                key = key.strip()
+                val = val.strip()
+                if key.lower().startswith("imię nazwisko"):
+                    md_lines.append(f"# {val}")
+                else:
+                    md_lines.append(f"**{key}:** {val}")
+                continue
+            else:
+                header_phase = False
+
+        if stripped.endswith(":"):
+            heading = stripped[:-1].strip()
+            md_lines.append(f"## {heading}")
+            continue
+
+        if stripped.startswith("-"):
+            md_lines.append(stripped)
+            continue
+
+        md_lines.append(stripped)
+
+    md_text = "\n".join(md_lines)
+
+    # 2) Zapisz Markdown do pliku (opcjonalne)
+    with open(md_path, "w", encoding="utf-8") as f:
+        f.write(md_text)
+
+    # 3) Konwersja Markdown → HTML
+    html_body = markdown.markdown(md_text, extensions=["extra", "smarty"])
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8">
+        <title>CV</title>
+      </head>
+      <body>
+        {html_body}
+      </body>
+    </html>
+    """
+
+    # 4) Generowanie PDF z HTML
+    # Jeśli wkhtmltopdf nie jest w PATH, podaj ścieżkę:
+    config = None
+    if wkhtmltopdf_path:
+        config = pdfkit.configuration(wkhtmltopdf=wkhtmltopdf_path)
+    options = {"encoding": "UTF-8"}
+    pdfkit.from_string(html, pdf_path, configuration=config, options=options)
+
+
+    return os.path.abspath(pdf_path)
+
 
 # PRZYKŁAD UŻYCIA:
 if __name__ == "__main__":
@@ -58,6 +142,8 @@ if __name__ == "__main__":
         "Senior Backend Developer (Python/Django). Poszukujemy osoby, która prowadzi "
         "projekty backendowe, optymalizuje zapytania do bazy danych i dba o wysoką jakość kodu."
     )
-    user_id = "user_1";
+    user_id = "user_1"
     cv_text = generate_cv(user_id=user_id, job_description=job_desc)
     print(cv_text)
+    pdf_file = create_pdf_from_text(cv_text, wkhtmltopdf_path=r"C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe")
+    print(f"Wygenerowano PDF: {pdf_file}")
