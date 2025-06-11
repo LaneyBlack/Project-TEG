@@ -5,6 +5,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_pinecone import PineconeVectorStore
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.prompts import PromptTemplate
+from cv_evaluator import evaluate_cv_quality
 
 import markdown
 import pdfkit
@@ -149,6 +150,11 @@ if __name__ == "__main__":
     user_id = "user_1"
     cv_text = generate_cv(user_id=user_id, job_description=job_desc)
     print(cv_text)
+
+    evaluation = evaluate_cv_quality(cv_text)
+    print("\n📋 Ocena wygenerowanego CV:\n")
+    print(evaluation)
+
     base_dir = os.path.dirname(os.path.dirname(__file__))
     pdf_file = create_pdf_from_text(cv_text,
                                     wkhtmltopdf_path=os.path.join(base_dir, "wkhtmltopdf", "bin", "wkhtmltopdf.exe"))
