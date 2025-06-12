@@ -81,21 +81,22 @@ class ApifyNoFluffJobsAPI:
         return jobs
 
 if __name__ == "__main__":
-    with open('jobs.json', 'r', encoding='utf-8') as f:
+    with open('../../data/jobs.json', 'r', encoding='utf-8') as f:
         jobs = json.load(f)
     api = ApifyNoFluffJobsAPI(TOKEN)
-    results = api.search_jobs("https://nofluffjobs.com/pl/backend?criteria=java")
+    results = api.search_jobs("https://nofluffjobs.com/pl/backend?criteria=fullstack")
 
     print(results)
     for job in results:
-        musts = [item['value'] for item in job['requirements'].get('musts', [])]
-        nices = [item['value'] for item in job['requirements'].get('nices', [])]
-        # Build the requirements section as plain text
         requirements_section = ""
-        if musts:
-            requirements_section += "Must have: " + ", ".join(musts) + "\n"
-        if nices:
-            requirements_section += "Nice to have: " + ", ".join(nices) + "\n"
+        if job.get('requirements', False):
+            musts = [item['value'] for item in job['requirements'].get('musts', [])]
+            nices = [item['value'] for item in job['requirements'].get('nices', [])]
+            # Build the requirements section as plain text
+            if musts:
+                requirements_section += "Must have: " + ", ".join(musts) + "\n"
+            if nices:
+                requirements_section += "Nice to have: " + ", ".join(nices) + "\n"
         job_dict = {
             "url": f'https://nofluffjobs.com/pl/job/{job["id"]}',
             "description": (
@@ -107,6 +108,6 @@ if __name__ == "__main__":
         }
         jobs.append(job_dict)
 
-    with open('jobs.json', 'w', encoding='utf-8') as f:
+    with open('../../data/jobs.json', 'w', encoding='utf-8') as f:
         json.dump(jobs, f, indent=2, ensure_ascii=False)
 
