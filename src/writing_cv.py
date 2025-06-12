@@ -12,10 +12,12 @@ from cv_evaluator import evaluate_cv_quality
 import markdown
 import pdfkit
 
+
 @traceable(name="Generate CV")
 def generate_cv(
         job_description: str,
-        user_id: str = "user_1"
+        user_id: str = "user_1",
+        additional_comments: str = "",
 ):
     # Load env & API key
     load_dotenv()
@@ -35,7 +37,7 @@ def generate_cv(
 
     # 1. Zdefiniuj swój szablon
     my_template = PromptTemplate(
-        input_variables=["context", "input"],
+        input_variables=["context", "input", "additional_comments"],
         template="""
         Na podstawie poniższych informacji z profilu wygeneruj profesjonalne CV dla stanowiska: {input}
         
@@ -62,12 +64,19 @@ def generate_cv(
         - …  
         
         i tak dalej
+        
         """
     )
 
     stuff_chain = create_stuff_documents_chain(chat, my_template)
-    qa_chain = create_retrieval_chain(retriever=retriever, combine_docs_chain=stuff_chain)
-    result = qa_chain.invoke({"input": job_description})
+    qa_chain = create_retrieval_chain(
+        retriever=retriever,
+        combine_docs_chain=stuff_chain
+    )
+    result = qa_chain.invoke({
+        "input": job_description,
+        "additional_comments": additional_comments
+    })
     return result["answer"]
 
 
