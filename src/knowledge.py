@@ -31,6 +31,17 @@ def ingest_to_knowledge_base(query: str, user_id: str) -> str:
     return "CV data inserted successfully."
 
 
+@traceable(name="Delete User Embeddings")
+def delete_user_embeddings(user_id: str) -> str:
+    try:
+        vectorstore._index.delete(
+            filter={"user_id": user_id}
+        )
+        return f"Embeddingi deleted."
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
 @traceable(name="Retrieve from Knowledge Base")
 def retrieve_from_knowledge_base(query: str, user_id: str) -> str:
     docsearch = PineconeVectorStore(index_name=INDEX_NAME, embedding=embeddings)
