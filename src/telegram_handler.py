@@ -170,8 +170,8 @@ async def generate_cv_command(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     base_dir = os.path.dirname(os.path.dirname(__file__))
     wkhtmltopdf_path = os.path.join(base_dir, "wkhtmltopdf", "bin", "wkhtmltopdf.exe")
-    md_path = f"cv_{user_id}.md"
-    pdf_path = f"cv_{user_id}.pdf"
+    md_path = f"data/cv_{user_id}.md"
+    pdf_path = f"data/cv_{user_id}.pdf"
 
     # Generate the PDF
     pdf_file = create_pdf_from_text(
