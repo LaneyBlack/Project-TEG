@@ -5,12 +5,14 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_pinecone import PineconeVectorStore
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.prompts import PromptTemplate
+from langsmith import traceable
+
 from cv_evaluator import evaluate_cv_quality
 
 import markdown
 import pdfkit
 
-
+@traceable(name="Generate CV")
 def generate_cv(
         job_description: str,
         user_id: str = "user_1"
