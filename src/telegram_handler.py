@@ -215,3 +215,25 @@ async def send_job_offers(update, jobs):
         "Reply with the number (1-5) of the job you want to pick, or tap 'Search again' to enter a new job title.",
         reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     )
+
+
+async def generate_cv_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    cv_text = "Your CV content here"  # Replace with actual CV text retrieval logic
+
+    base_dir = os.path.dirname(os.path.dirname(__file__))
+    wkhtmltopdf_path = os.path.join(base_dir, "wkhtmltopdf", "bin", "wkhtmltopdf.exe")
+    md_path = f"cv_{user_id}.md"
+    pdf_path = f"cv_{user_id}.pdf"
+
+    # Generate the PDF
+    pdf_file = create_pdf_from_text(
+        text=cv_text,
+        md_path=md_path,
+        pdf_path=pdf_path,
+        wkhtmltopdf_path=wkhtmltopdf_path
+    )
+
+    # Send the PDF to the user
+    with open(pdf_file, "rb") as pdf:
+        await update.message.reply_document(document=pdf, filename="CV.pdf")
