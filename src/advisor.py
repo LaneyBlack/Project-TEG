@@ -40,9 +40,24 @@ def analyze_job_offer_against_cv(job_offer: str, user_id: str) -> str:
     # Reuse retrieval pipeline
     return retrieve_from_knowledge_base(advisor_query, user_id)
 
+
 @traceable(name="Get Job Offer")
-def get_job_offers_cv(user_id: str) -> str:
-    retrieve_from_knowledge_base()
+def get_job_offers_cv(job_title: str) -> str:
+    query = f"""
+       Find the top 5 most relevant job offers based on the following job query:
+
+       "{job_title}"
+
+       Provide:
+       - Job title
+       - One-sentence summary or key skills
+       - Location (if available)
+       - Do not include user-specific data, only general job offers.
+
+       Format the result as a numbered list.
+       """
+    return retrieve_from_knowledge_base(query=query, user_id="offers")
+
 
 @traceable(name="Insert Job Offer")
 def insert_job_offer(job_offer: str) -> str:
