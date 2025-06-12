@@ -78,7 +78,6 @@ def generate_cv(
         "additional_comments": additional_comments
     })
     return result["answer"]
-    return result["answer"]
 
 
 def create_pdf_from_text(
