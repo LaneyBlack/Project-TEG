@@ -1,9 +1,10 @@
+import re
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 from langsmith import traceable
 
 @traceable(name="Evaluate CV Quality")
-def evaluate_cv_quality(cv_text: str) -> str:
+def evaluate_cv_quality(cv_text: str) -> dict:
     chat = ChatOpenAI(temperature=0.3, model="gpt-4o")
 
     prompt = f"""
@@ -35,4 +36,18 @@ def evaluate_cv_quality(cv_text: str) -> str:
     ]
 
     response = chat.invoke(messages)
-    return response.content
+    response_text = response.content
+
+    match = re.search(r"\b(?:score|rating)\b[^0-9]*(\d{1,2})\b", response_text, re.IGNORECASE)
+    if match:
+        score = int(match.group(1))
+        score = min(score, 10)
+    else:
+        score = None
+
+    return {
+        "score": score,
+        "details": response_text
+    }
+
+
