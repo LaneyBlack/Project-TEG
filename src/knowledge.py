@@ -28,7 +28,7 @@ def ingest_to_knowledge_base(query: str, user_id: str) -> str:
         texts,
         metadatas=[{"user_id": user_id}] * len(texts)
     )
-    return "CV data inserted successfully."
+    return "Data inserted successfully."
 
 
 @traceable(name="Retrieve from Knowledge Base")
@@ -46,5 +46,4 @@ def retrieve_from_knowledge_base(query: str, user_id: str) -> str:
         combine_docs_chain=stuff_docs_chain
     )
     result = retrival_chain.invoke(input={"input": query})
-
     return result["answer"]
