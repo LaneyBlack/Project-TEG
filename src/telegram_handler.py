@@ -57,7 +57,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif state == "expecting_job_offer":
         await update.message.reply_text("🤖 Analyzing job offer and storing as active job...")
-        ingest_to_knowledge_base(text, user_id, is_job=True)
+        # Insert offer
+        ingest_to_knowledge_base(text, 'offers')
         user_states[user_id]["active_job"] = text
         user_states[user_id]["state"] = "ready"
         save_user_states()
@@ -74,15 +75,35 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif state == "expecting_job_title":
         job_title = text
-        jobs = get_job_offers_cv(job_title)  # Returns a list of job dicts[5]
+        jobs = get_job_offers_cv(job_title)  # Returns a list of job dicts
         if not jobs:
             await update.message.reply_text("No jobs found for that title. Try another one.")
             return
         user_states[user_id]["job_search_results"] = jobs
-        user_states[user_id]["job_search_index"] = 0
         user_states[user_id]["state"] = "expecting_job_selection"
         save_user_states()
-        await send_job_selection(update, jobs, 0)
+        await send_job_offers(update, jobs)
+    elif state == "expecting_job_selection":
+        if text in ['1', '2', '3', '4', '5']:
+            idx = int(text) - 1
+            jobs = user_states[user_id].get("job_search_results", [])
+            if 0 <= idx < len(jobs):
+                user_states[user_id]["active_job"] = jobs[idx]["description"]
+                user_states[user_id]["state"] = "ready"
+                save_user_states()
+                await update.message.reply_text(
+                    f"✅ You selected: {jobs[idx]['title']}\nYou can now generate a tailored CV.",
+                    reply_markup=main_keyboard
+                )
+            else:
+                await update.message.reply_text("Invalid selection. Please choose a valid number.")
+        elif text.lower() == "search again":
+            user_states[user_id]["state"] = "expecting_job_title"
+            save_user_states()
+            await update.message.reply_text(
+                "Please enter a new job title.",
+                reply_markup=ReplyKeyboardRemove()
+            )
 
     elif state == "expecting_job_selection":
         await update.message.reply_text(
@@ -103,6 +124,7 @@ async def generate_cv_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     if not active_job:
         await update.message.reply_text("No job offer selected. Please insert or find a job first.")
         return
+    # ToDo
     await update.message.reply_text("📝 Generating CV for your selected job...")
     cv_text = generate_cv(active_job, user_id)
     await update.message.reply_text(f"📄 Generated CV:\n\n{cv_text}")
@@ -180,5 +202,16 @@ async def send_job_selection(update: Update, jobs, start_index):
     keyboard = [['1', '2', '3', '4', '5', 'More']]
     await update.message.reply_text(
         "Top jobs:\n\n" + "\n\n".join(job_msgs),
+        reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    )
+
+async def send_job_offers(update, jobs):
+    for idx, job in enumerate(jobs, 1):
+        # Customize this formatting as needed
+        text = f"{idx}. {job['title']}\n{job.get('company', '')}\n{job['description'][:200]}..."
+        await update.message.reply_text(text)
+    keyboard = [['1', '2', '3', '4', '5'], ['Search again']]
+    await update.message.reply_text(
+        "Reply with the number (1-5) of the job you want to pick, or tap 'Search again' to enter a new job title.",
         reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
     )

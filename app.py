@@ -6,10 +6,6 @@ from telegram_handler import start, handle_message, generate_cv_command, clear_e
 
 load_dotenv()
 
-LANGSMITH_API_KEY=os.environ.get("LANGSMITH_API_KEY")
-LANGSMITH_PROJECT=os.environ.get("LANGSMITH_PROJECT")
-print(LANGSMITH_API_KEY)
-print(LANGSMITH_PROJECT)
 BOT_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 
 def main():
