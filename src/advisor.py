@@ -61,4 +61,4 @@ def get_job_offers_cv(job_title: str) -> str:
 
 @traceable(name="Insert Job Offer")
 def insert_job_offer(job_offer: str) -> str:
-    ingest_to_knowledge_base(job_offer, 'offers')
+    return ingest_to_knowledge_base(job_offer, 'offers')
