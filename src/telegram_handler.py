@@ -4,7 +4,7 @@ from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes
 from advisor import analyze_job_offer_against_cv
 from cv_evaluator import evaluate_cv_quality
-from knowledge import ingest_to_knowledge_base
+from knowledge import ingest_to_knowledge_base, retrieve_from_knowledge_base
 from writing_cv import generate_cv
 
 start_keyboard = ReplyKeyboardMarkup([['/start']], resize_keyboard=True)
@@ -39,7 +39,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif state == "expecting_offer":
         print('🤖 Analyzing job offer')
         await update.message.reply_text("🤖 Analyzing job offer against your CV...")
-        result = analyze_job_offer_against_cv(text)
+        result = retrieve_from_knowledge_base(text, user_id)
         await update.message.reply_text(f"📊 Match Analysis:\n\n{result}")
         user_states[user_id]["state"] = "expecting_offer"
     else:
