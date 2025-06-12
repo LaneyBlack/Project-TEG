@@ -8,6 +8,8 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from langsmith import traceable
 
+from knowledge import retrieve_from_knowledge_base
+
 load_dotenv()
 
 # Load environment variables
@@ -20,7 +22,7 @@ vectorstore = PineconeVectorStore(index_name=INDEX_NAME, embedding=embeddings)
 
 
 @traceable(name="Analyze Job Offer")
-def analyze_job_offer_against_cv(job_offer: str) -> str:
+def analyze_job_offer_against_cv(job_offer: str, user_id: str) -> str:
     # Initialize LLM and retrieval chain
     chat = ChatOpenAI(verbose=True, temperature=0)
     retrieval_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
@@ -41,9 +43,12 @@ def analyze_job_offer_against_cv(job_offer: str) -> str:
     - Skills that match well.
     - Skills where the user is overqualified.
     - Skills or requirements the user lacks or should improve.
-
     Return your advice in structured bullet points. 
     """
 
     result = retrieval_chain.invoke({"input": advisor_query})
     return result["answer"]
+
+@traceable(name="Get Job Offer")
+def get_job_offers_cv(user_id: str) -> str:
+    retrieve_from_knowledge_base()
