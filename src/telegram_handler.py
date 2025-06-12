@@ -1,17 +1,22 @@
-from telegram import Update
+import json
+
+from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes
 from advisor import analyze_job_offer_against_cv
 from cv_evaluator import evaluate_cv_quality
 from knowledge import ingest_to_knowledge_base
 from writing_cv import generate_cv
 
+start_keyboard = ReplyKeyboardMarkup([['/start']], resize_keyboard=True)
+generate_keyboard = ReplyKeyboardMarkup([['/generate_cv']], resize_keyboard=True)
+
 # Simple per-user state machine
-user_states = {}
+user_states = json.load(open('data/user_states.json'))
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "👋 Hello! I'm your Career Advisor Bot.\n\n"
-        "Send me your CV (as plain text), and then the job offer you'd like to evaluate."
+        "Send me your CV (as plain text), and then the job offer you'd like to evaluate.",
     )
     user_states[update.effective_user.id] = {"state": "expecting_cv"}
 
