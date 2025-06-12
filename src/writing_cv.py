@@ -69,8 +69,6 @@ def generate_cv(
     )
 
     stuff_chain = create_stuff_documents_chain(chat, my_template)
-    # qa_chain = create_retrieval_chain(retriever=retriever, combine_docs_chain=stuff_chain)
-    # result = qa_chain.invoke({"input": job_description})
     qa_chain = create_retrieval_chain(
         retriever=retriever,
         combine_docs_chain=stuff_chain
