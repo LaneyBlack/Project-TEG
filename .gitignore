@@ -180,3 +180,5 @@ cython_debug/
 /.idea/vcs.xml
 /.idea/.gitignore
 /.idea/
+
+/data/
