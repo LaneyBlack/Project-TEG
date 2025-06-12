@@ -1,7 +1,9 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 from advisor import analyze_job_offer_against_cv
+from cv_evaluator import evaluate_cv_quality
 from knowledge import ingest_to_knowledge_base
+from writing_cv import generate_cv
 
 # Simple per-user state machine
 user_states = {}
@@ -24,15 +26,31 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     state = user_states[user_id]["state"]
 
     if state == "expecting_cv":
-        # Store the CV
+        print('📄 CV received.')
         await update.message.reply_text("📄 CV received. Embedding and storing...")
         ingest_to_knowledge_base(text, user_id)
         user_states[user_id]["state"] = "expecting_offer"
         await update.message.reply_text("✅ CV stored. Now send me the job offer you'd like to evaluate.")
     elif state == "expecting_offer":
+        print('🤖 Analyzing job offer')
         await update.message.reply_text("🤖 Analyzing job offer against your CV...")
         result = analyze_job_offer_against_cv(text)
         await update.message.reply_text(f"📊 Match Analysis:\n\n{result}")
-        user_states[user_id]["state"] = "expecting_offer"  # Allow multiple offers
+        user_states[user_id]["state"] = "expecting_offer"
     else:
         await update.message.reply_text("❓ Unexpected input. Please send /start to begin again.")
+
+async def generate_cv_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_id = update.effective_user.id
+    job_description = " ".join(context.args)  # e.g., /generate_cv <job description>
+    if not job_description:
+        await update.message.reply_text("Please provide a job description after the command.")
+        return
+    print('📝 Generating CV')
+    await update.message.reply_text("📝 Generating CV for your job description...")
+    cv_text = generate_cv(job_description, user_id)
+    await update.message.reply_text(f"📄 Generated CV:\n\n{cv_text}")
+    print('🔍 Evaluating CV')
+    await update.message.reply_text("🔍 Evaluating CV quality...")
+    evaluation = evaluate_cv_quality(cv_text)
+    await update.message.reply_text(f"✅ CV Quality Evaluation:\n\n{evaluation}")
