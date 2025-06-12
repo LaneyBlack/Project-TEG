@@ -44,7 +44,7 @@ def analyze_job_offer_against_cv(job_offer: str, user_id: str) -> str:
 @traceable(name="Get Job Offer")
 def get_job_offers_cv(job_title: str) -> str:
     query = f"""
-       Find the top 5 most relevant job offers based on the following job query:
+       Find the top 5 most relevant job offers (compare only job titles) based on the following job query:
 
        "{job_title}"
 
@@ -52,7 +52,8 @@ def get_job_offers_cv(job_title: str) -> str:
        - Job title
        - One-sentence summary or key skills
        - Location (if available)
-       - Do not include user-specific data, only general job offers.
+       - Small description of this job offer
+       - This Job url
 
        Format the result as a numbered list.
        """
