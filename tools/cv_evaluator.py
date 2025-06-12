@@ -1,7 +1,9 @@
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
+from langsmith import traceable
 
 
+@traceable(name="Evaluate CV Quality")
 def evaluate_cv_quality(cv_text: str) -> str:
     chat = ChatOpenAI(temperature=0.3, model="gpt-4o")
 
