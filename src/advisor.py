@@ -8,7 +8,7 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from langsmith import traceable
 
-from knowledge import retrieve_from_knowledge_base
+from knowledge import retrieve_from_knowledge_base, ingest_to_knowledge_base
 
 load_dotenv()
 
@@ -23,15 +23,6 @@ vectorstore = PineconeVectorStore(index_name=INDEX_NAME, embedding=embeddings)
 
 @traceable(name="Analyze Job Offer")
 def analyze_job_offer_against_cv(job_offer: str, user_id: str) -> str:
-    # Initialize LLM and retrieval chain
-    chat = ChatOpenAI(verbose=True, temperature=0)
-    retrieval_prompt = hub.pull("langchain-ai/retrieval-qa-chat")
-    combine_chain = create_stuff_documents_chain(chat, retrieval_prompt)
-
-    retriever = vectorstore.as_retriever(search_kwargs={"filter": {"user_id": user_id}})
-    retrieval_chain = create_retrieval_chain(retriever, combine_chain)
-
-    # Compose query
     advisor_query = f"""
     You are a career advisor helping a user evaluate a job offer against their CV.
     Here is the job offer:
@@ -43,12 +34,16 @@ def analyze_job_offer_against_cv(job_offer: str, user_id: str) -> str:
     - Skills that match well.
     - Skills where the user is overqualified.
     - Skills or requirements the user lacks or should improve.
-    Return your advice in structured bullet points. 
+    Return your advice in structured bullet points.
     """
 
-    result = retrieval_chain.invoke({"input": advisor_query})
-    return result["answer"]
+    # Reuse retrieval pipeline
+    return retrieve_from_knowledge_base(advisor_query, user_id)
 
 @traceable(name="Get Job Offer")
 def get_job_offers_cv(user_id: str) -> str:
     retrieve_from_knowledge_base()
+
+@traceable(name="Insert Job Offer")
+def insert_job_offer(job_offer: str) -> str:
+    ingest_to_knowledge_base(job_offer, 'offers')
