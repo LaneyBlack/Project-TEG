@@ -39,32 +39,34 @@ def generate_cv(
     my_template = PromptTemplate(
         input_variables=["context", "input", "additional_comments"],
         template="""
-        Na podstawie poniższych informacji z profilu wygeneruj profesjonalne CV dla stanowiska: {input}
+        Based on the following profile information, generate a professional resume for the position: {input}
         
-        Profil:
+        Profile:
         {context}
         
-        CV ma być krótkie i na temat. Nie używaj słowa “CV” ani tytułu “Curriculum Vitae”.
-        Zwróć wynik w formacie Markdown zgodnie z poniższą strukturą:
+        The resume should be short and to the point. Do not use the word “CV” or the title “Curriculum Vitae.”
+        Return the result in Markdown format according to the following structure:
         
-        # Imię Nazwisko
-        **Telefon:** <numer>
+        # Firstname Lastname
+        **Phone:** <numer>
         
-        **E-mail:** <adres>
+        **Email:** <adres>
         
-        **Lokalizacja:** <miasto, kraj>
+        **Location:** <miasto, kraj>
         
-        ## O mnie
+        ## About Me
         …  
         
-        ## Umiejętności
+        ## Skills
         - …  
         
-        ## Języki
+        ## Languages
         - …  
         
-        i tak dalej
+        and so on
         
+        Apply the following feedback when generating the resume: {additional_comments}
+        **IMPORTANT:** Respond _ONLY_ with the resume in Markdown using the exact structure; do _not_ include any analysis, explanations, or extra text.
         """
     )
 
@@ -161,12 +163,27 @@ if __name__ == "__main__":
     user_id = "user_1"
     cv_text = generate_cv(user_id=user_id, job_description=job_desc)
     print(cv_text)
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - ")
 
     evaluation = evaluate_cv_quality(cv_text)
     print("\n📋 Ocena wygenerowanego CV:\n")
     print(evaluation)
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - ")
 
+    raw = evaluation["details"]
+    # wyciągnij tylko bullet-pointy albo podsumowanie:
+    comments = "\n".join(
+        line for line in raw.splitlines()
+        if line.strip().startswith("- ")
+    )
+    cv_text = generate_cv(user_id=user_id, job_description=job_desc, additional_comments=comments)
+    print(cv_text)
     base_dir = os.path.dirname(os.path.dirname(__file__))
     pdf_file = create_pdf_from_text(cv_text,
                                     wkhtmltopdf_path=os.path.join(base_dir, "wkhtmltopdf", "bin", "wkhtmltopdf.exe"))
     print(f"Wygenerowano PDF: {pdf_file}")
+    print("- - - - - - - - - - - - - - - - - - - - - - - - - ")
+
+    evaluation = evaluate_cv_quality(cv_text)
+    print("\n📋 Ocena wygenerowanego CV:\n")
+    print(evaluation)
