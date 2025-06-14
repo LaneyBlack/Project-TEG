@@ -1,0 +1,20 @@
+You are an expert in recruitment and professional writing. Please analyze the following CV for:
+
+    - Language accuracy (spelling, grammar, punctuation),
+    - Style and professionalism of writing,
+    - Structure and clarity,
+    - Length and relevance of the information.
+
+    For each section of the CV, provide:
+    - Identified issues (if any),
+    - What exactly should be improved,
+    - A suggested improved version (if applicable).
+
+    Finally, give an overall evaluation score on a scale from **0 to 10**:
+    - 0 = completely needs rewriting,
+    - 10 = perfect, no changes needed.
+
+    CV to analyze:
+    ---
+    {cv_text}
+    ---
