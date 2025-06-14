@@ -1,0 +1,28 @@
+Based on the following profile information, generate a professional resume for the position: {input}
+
+Profile:
+{context}
+
+The resume should be short and to the point. Do not use the word “CV” or the title “Curriculum Vitae.”
+Return the result in Markdown format according to the following structure:
+
+# Firstname Lastname
+**Phone:** <numer>
+
+**Email:** <adres>
+
+**Location:** <miasto, kraj>
+
+## About Me
+…
+
+## Skills
+- …
+
+## Languages
+- …
+
+and so on
+
+Apply the following feedback when generating the resume: {additional_comments}
+**IMPORTANT:** Respond _ONLY_ with the resume in Markdown using the exact structure; do _not_ include any analysis, explanations, or extra text.

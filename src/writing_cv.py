@@ -7,10 +7,13 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.prompts import PromptTemplate
 from langsmith import traceable
 
-from cv_evaluator import evaluate_cv_quality
+from src.cv_evaluator import evaluate_cv_quality
+from src.prompts.prompts import generate_cv_prompt
 
 import markdown
 import pdfkit
+
+
 
 # Load env & API key
 load_dotenv()
@@ -26,50 +29,12 @@ chat = ChatOpenAI(temperature=0.7, verbose=True)
 
 
 @traceable(name="Generate CV")
-def generate_cv(
-        job_description: str,
-        user_id: str = "user_1",
-        additional_comments: str = "",
-):
+def generate_cv(job_description: str, user_id: str = "user_1", additional_comments: str = ""):
     # Build retrieval → generation chain
     retriever = vectorstore.as_retriever(search_kwargs={"filter": {"user_id": user_id}, "k": 5})
+    prompt_template = generate_cv_prompt
 
-    # 1. Zdefiniuj swój szablon
-    my_template = PromptTemplate(
-        input_variables=["context", "input", "additional_comments"],
-        template="""
-        Based on the following profile information, generate a professional resume for the position: {input}
-        
-        Profile:
-        {context}
-        
-        The resume should be short and to the point. Do not use the word “CV” or the title “Curriculum Vitae.”
-        Return the result in Markdown format according to the following structure:
-        
-        # Firstname Lastname
-        **Phone:** <numer>
-        
-        **Email:** <adres>
-        
-        **Location:** <miasto, kraj>
-        
-        ## About Me
-        …  
-        
-        ## Skills
-        - …  
-        
-        ## Languages
-        - …  
-        
-        and so on
-        
-        Apply the following feedback when generating the resume: {additional_comments}
-        **IMPORTANT:** Respond _ONLY_ with the resume in Markdown using the exact structure; do _not_ include any analysis, explanations, or extra text.
-        """
-    )
-
-    stuff_chain = create_stuff_documents_chain(chat, my_template)
+    stuff_chain = create_stuff_documents_chain(chat, prompt_template)
     qa_chain = create_retrieval_chain(
         retriever=retriever,
         combine_docs_chain=stuff_chain
