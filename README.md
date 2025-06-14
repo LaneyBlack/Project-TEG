@@ -1,6 +1,6 @@
 # 💼 CV Advisor
 
-**CV Advisor** is an intelligent Telegram bot designed to help you elevate your job search and CV creation experience. Developed as part of the "TEG Technologie Generatywne i AI" course at PJATK Magistratura, this project leverages cutting-edge AI and generative technologies to provide personalized CV advice and job-matching features.
+**CV Advisor** is an intelligent Telegram bot designed to help you elevate your job search and CV creation experience. Developed as part of the "TEG (Technologie Generatywne i AI)" course at PJATK Magistratura, this project leverages cutting-edge AI and generative technologies to provide personalized CV advice and job-matching features.
 
 ---
 
