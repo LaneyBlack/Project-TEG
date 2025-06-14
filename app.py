@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
-from telegram_handler import start, handle_message, generate_cv_command, clear_embeddings_command, insert_job_command, \
+from src.telegram_handler import start, handle_message, generate_cv_command, clear_embeddings_command, insert_job_command, \
     find_job_command, write_cv_command
 
 load_dotenv()

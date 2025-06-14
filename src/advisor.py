@@ -8,7 +8,7 @@ from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from langsmith import traceable
 
-from knowledge import retrieve_from_knowledge_base, ingest_to_knowledge_base
+from src.knowledge import retrieve_from_knowledge_base, ingest_to_knowledge_base
 
 # load_dotenv()
 

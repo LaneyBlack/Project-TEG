@@ -46,7 +46,7 @@ def generate_cv(job_description: str, user_id: str = "user_1", additional_commen
     return result["answer"]
 
 
-def create_pdf_from_text(text: str, md_path: str = "cv.md", pdf_path: str = "cv.pdf",
+def create_pdf_from_text(text: str, md_path: str = "cv.md", pdf_path: str = "data/cv.pdf",
                          wkhtmltopdf_path: str = None) -> str:
     # 1) Konwersja na Markdown
     md_lines = []

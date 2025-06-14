@@ -4,10 +4,10 @@ import os
 from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import ContextTypes
 
-from advisor import get_job_offers_cv
-from cv_evaluator import evaluate_cv_quality
-from knowledge import ingest_to_knowledge_base, delete_user_embeddings
-from writing_cv import generate_cv, create_pdf_from_text
+from src.advisor import get_job_offers_cv
+from src.cv_evaluator import evaluate_cv_quality
+from src.knowledge import ingest_to_knowledge_base, delete_user_embeddings
+from src.writing_cv import generate_cv, create_pdf_from_text
 
 # Simple per-user state machine
 USER_STATES_PATH = 'data/user_states.json'
