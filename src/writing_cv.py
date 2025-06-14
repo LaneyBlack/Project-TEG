@@ -12,6 +12,18 @@ from cv_evaluator import evaluate_cv_quality
 import markdown
 import pdfkit
 
+# Load env & API key
+load_dotenv()
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise RuntimeError("Brakuje zmiennej środowiskowej OPENAI_API_KEY w .env")
+
+# Init embeddings, vectorstore, chat
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+index_name = os.environ["INDEX_NAME"]
+vectorstore = PineconeVectorStore(index_name=index_name, embedding=embeddings)
+chat = ChatOpenAI(temperature=0.7, verbose=True)
+
 
 @traceable(name="Generate CV")
 def generate_cv(
@@ -19,19 +31,6 @@ def generate_cv(
         user_id: str = "user_1",
         additional_comments: str = "",
 ):
-    # Load env & API key
-    load_dotenv()
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise RuntimeError("Brakuje zmiennej środowiskowej OPENAI_API_KEY w .env")
-    os.environ["OPENAI_API_KEY"] = api_key
-
-    # Init embeddings, vectorstore, chat
-    embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-    index_name = os.environ["INDEX_NAME"]
-    vectorstore = PineconeVectorStore(index_name=index_name, embedding=embeddings)
-    chat = ChatOpenAI(temperature=0.7, verbose=True)
-
     # Build retrieval → generation chain
     retriever = vectorstore.as_retriever(search_kwargs={"filter": {"user_id": user_id}, "k": 5})
 

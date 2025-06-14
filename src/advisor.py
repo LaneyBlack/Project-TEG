@@ -10,15 +10,7 @@ from langsmith import traceable
 
 from knowledge import retrieve_from_knowledge_base, ingest_to_knowledge_base
 
-load_dotenv()
-
-# Load environment variables
-INDEX_NAME = os.environ.get("INDEX_NAME")
-user_id = "user_1"
-
-# Initialize embedding and vector store
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
-vectorstore = PineconeVectorStore(index_name=INDEX_NAME, embedding=embeddings)
+# load_dotenv()
 
 
 @traceable(name="Analyze Job Offer")

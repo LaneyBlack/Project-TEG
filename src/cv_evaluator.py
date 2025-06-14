@@ -3,10 +3,11 @@ from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 from langsmith import traceable
 
+chat = ChatOpenAI(temperature=0.3, model="gpt-4o")
+
+
 @traceable(name="Evaluate CV Quality")
 def evaluate_cv_quality(cv_text: str) -> dict:
-    chat = ChatOpenAI(temperature=0.3, model="gpt-4o")
-
     prompt = f"""
     You are an expert in recruitment and professional writing. Please analyze the following CV for:
 
@@ -49,5 +50,3 @@ def evaluate_cv_quality(cv_text: str) -> dict:
         "score": score,
         "details": response_text
     }
-
-
