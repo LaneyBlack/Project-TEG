@@ -6,7 +6,7 @@ from telegram.ext import ContextTypes
 
 from src.advisor import get_job_offers_cv
 from src.cv_evaluator import evaluate_cv_quality
-from src.knowledge import ingest_to_knowledge_base, delete_user_embeddings
+from src.managers.knowledge import ingest_to_knowledge_base, delete_user_embeddings
 from src.writing_cv import generate_cv, create_pdf_from_text
 
 # Simple per-user state machine

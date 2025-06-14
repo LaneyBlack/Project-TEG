@@ -1,14 +1,10 @@
-import os
-
-from dotenv import load_dotenv
-from langchain import hub
-from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.chains.retrieval import create_retrieval_chain
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_pinecone import PineconeVectorStore
 from langsmith import traceable
 
-from src.knowledge import retrieve_from_knowledge_base, ingest_to_knowledge_base
+from src.managers.knowledge import retrieve_from_knowledge_base, ingest_to_knowledge_base
+from langsmith import traceable
+
+from src.managers.knowledge import retrieve_from_knowledge_base, ingest_to_knowledge_base
+
 
 # load_dotenv()
 

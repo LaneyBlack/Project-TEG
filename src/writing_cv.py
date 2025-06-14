@@ -1,19 +1,15 @@
+import markdown
 import os
+import pdfkit
 from dotenv import load_dotenv
-from langchain.chains.retrieval import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain_pinecone import PineconeVectorStore
+from langchain.chains.retrieval import create_retrieval_chain
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain.prompts import PromptTemplate
+from langchain_pinecone import PineconeVectorStore
 from langsmith import traceable
 
 from src.cv_evaluator import evaluate_cv_quality
 from src.prompts.prompts import generate_cv_prompt
-
-import markdown
-import pdfkit
-
-
 
 # Load env & API key
 load_dotenv()
@@ -140,7 +136,7 @@ if __name__ == "__main__":
     print(cv_text)
     base_dir = os.path.dirname(os.path.dirname(__file__))
     pdf_file = create_pdf_from_text(cv_text,
-                                    wkhtmltopdf_path=os.path.join(base_dir, "wkhtmltopdf", "bin", "wkhtmltopdf.exe"))
+                                    wkhtmltopdf_path=os.path.join(base_dir, "htmltopdf", "bin", "wkhtmltopdf.exe"))
     print(f"Wygenerowano PDF: {pdf_file}")
     print("- - - - - - - - - - - - - - - - - - - - - - - - - ")
 
